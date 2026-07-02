@@ -1,0 +1,463 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard - ERPilot AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+        .container-main {
+            padding: 30px 0;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .pending { color: #ffc107; }
+        .approved { color: #28a745; }
+        .rejected { color: #dc3545; }
+        .total { color: #667eea; }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-logout:hover {
+            background: #c82333;
+        }
+        .welcome-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        .welcome-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .welcome-section p {
+            color: #666;
+            margin: 0;
+        }
+        .user-profile-badge {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .role-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .employee-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .employee-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+        .action-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+        .btn-view:hover {
+            background: #5568d3;
+        }
+        .btn-manage {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-manage:hover {
+            background: #138496;
+        }
+        .section-title {
+            color: #333;
+            font-weight: 700;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">ERPilot AI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link">
+                            <i class="bi bi-person-circle"></i> {{ user.first_name|default:user.username }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn-logout" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid container-main">
+        <div class="container">
+            <!-- Welcome Section with User Profile -->
+            <div class="welcome-section">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2>Welcome back, {{ user.first_name|default:user.username }}! </h2>
+                        <p>Manage and review employee expense claims efficiently.</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Stats Section -->
+            <div class="row g-4 mb-30">
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon pending">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <div class="stat-label">Pending Claims</div>
+                        <div class="stat-number">{{ pending_claims }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon approved">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="stat-label">Approved Claims</div>
+                        <div class="stat-number">{{ approved_claims }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon rejected">
+                            <i class="bi bi-x-circle"></i>
+                        </div>
+                        <div class="stat-label">Rejected Claims</div>
+                        <div class="stat-number">{{ rejected_claims }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                        <div class="stat-label">Total Claims</div>
+                        <div class="stat-number">{{ total_claims }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Section -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <a href="{% url 'create_claim' %}" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 12px 30px; border-radius: 8px; color: white; text-decoration: none;">
+                        <i class="bi bi-plus-circle"></i> Submit Expense Claim
+                    </a>
+                </div>
+                <div class="col-md-6" style="text-align: right;">
+                    <a href="{% url 'manage_all_employees' %}" class="btn btn-primary" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border: none; padding: 12px 30px; border-radius: 8px; color: white; text-decoration: none;">
+                        <i class="bi bi-people-fill"></i> Manage All Employees
+                    </a>
+                </div>
+            </div>
+
+            <!-- Managed Employees Section -->
+            <h5 class="section-title">
+                <i class="bi bi-people"></i> Your Managed Employees
+            </h5>
+            <div class="row mb-4">
+                {% if managed_employees %}
+                    {% for emp_profile in managed_employees %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="employee-card">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <h6 style="margin: 0 0 8px 0;">
+                                        <i class="bi bi-person"></i> {{ emp_profile.user.get_full_name|default:emp_profile.user.username }}
+                                    </h6>
+                                    <small style="color: #666;">
+                                        <i class="bi bi-briefcase"></i> {{ emp_profile.role }}
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if emp_profile.role == 'MANAGER' %}
+                                        <span class="badge bg-primary" title="This user is a Manager">
+                                            <i class="bi bi-shield-check"></i> Manager
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-info" title="This user is an Employee">
+                                            <i class="bi bi-person-check"></i> Employee
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px;">
+                                <a href="{% url 'manage_employee' emp_profile.user.id %}" class="action-btn btn-manage">
+                                    <i class="bi bi-pencil"></i> Manage & View Claims
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div style="background: white; padding: 40px; text-align: center; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);">
+                            <i class="bi bi-inbox" style="font-size: 40px; color: #ccc;"></i>
+                            <p style="margin-top: 15px; color: #999;">No employees assigned yet</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- All Claims Section -->
+            <h5 class="section-title">
+                <i class="bi bi-file-earmark-text"></i> All Claims & Approvals
+            </h5>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-end">
+                        <input type="hidden" name="filter" value="{{ current_filter|default:'all' }}">
+                        <div class="col-md-8">
+                            <label class="form-label" style="font-weight: 600;">Search Claims</label>
+                            <input type="text" class="form-control" name="search" value="{{ search_query }}" placeholder="Search by employee, title, or amount">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="?filter={{ current_filter|default:'all' }}" class="btn btn-outline-secondary w-100">Clear</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="?filter=all{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="btn {% if current_filter == 'all' or not current_filter %}btn-primary{% else %}btn-outline-primary{% endif %}" style="border-radius: 8px; padding: 10px 20px; text-decoration: none; font-weight: 600;">
+                    <i class="bi bi-list"></i> All Claims ({{ total_claims }})
+                </a>
+                <a href="?filter=pending{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="btn {% if current_filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}" style="border-radius: 8px; padding: 10px 20px; text-decoration: none; font-weight: 600;">
+                    <i class="bi bi-hourglass-split"></i> Pending ({{ pending_claims }})
+                </a>
+                <a href="?filter=approved{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="btn {% if current_filter == 'approved' %}btn-success{% else %}btn-outline-success{% endif %}" style="border-radius: 8px; padding: 10px 20px; text-decoration: none; font-weight: 600;">
+                    <i class="bi bi-check-circle"></i> Approved ({{ approved_claims }})
+                </a>
+                <a href="?filter=rejected{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="btn {% if current_filter == 'rejected' %}btn-danger{% else %}btn-outline-danger{% endif %}" style="border-radius: 8px; padding: 10px 20px; text-decoration: none; font-weight: 600;">
+                    <i class="bi bi-x-circle"></i> Rejected ({{ rejected_claims }})
+                </a>
+            </div>
+            
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" style="font-size: 13px;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th>Employee</th>
+                                    <th>Title</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Fraud Score</th>
+                                    <th>AI Recommendation</th>
+                                    <th>AI Confidence</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if claims_pending %}
+                                    {% for claim in claims_pending %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ claim.employee.get_full_name|default:claim.employee.username }}</strong>
+                                        </td>
+                                        <td>
+                                            <span title="{{ claim.title }}">{{ claim.title|truncatewords:3 }}</span>
+                                        </td>
+                                        <td><strong>₹{{ claim.amount }}</strong></td>
+                                        <td>{{ claim.created_at|date:"d M Y" }}</td>
+                                        <td>
+                                            {% if claim.override_status != 'NONE' %}
+                                                {% if claim.override_status == 'APPROVED' %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle"></i> Manager Approved
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-x-circle"></i> Manager Rejected
+                                                    </span>
+                                                {% endif %}
+                                            {% else %}
+                                                {% if claim.status == 'PENDING' %}
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="bi bi-hourglass-split"></i> Pending
+                                                    </span>
+                                                {% elif claim.status == 'APPROVED' %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle"></i> Approved
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-x-circle"></i> Rejected
+                                                    </span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if claim.fraud_score > 70 %}
+                                                <span class="badge bg-danger">{{ claim.fraud_score|default:"0" }}%</span>
+                                            {% elif claim.fraud_score > 40 %}
+                                                <span class="badge bg-warning text-dark">{{ claim.fraud_score|default:"0" }}%</span>
+                                            {% else %}
+                                                <span class="badge bg-success">{{ claim.fraud_score|default:"0" }}%</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small style="max-width: 150px; display: inline-block; word-break: break-word;">
+                                                {% if claim.ai_recommendation %}
+                                                    {% if "APPROVE" in claim.ai_recommendation|upper %}
+                                                        <span class="badge bg-success">✓ Approve</span>
+                                                    {% elif "REJECT" in claim.ai_recommendation|upper %}
+                                                        <span class="badge bg-danger">✗ Reject</span>
+                                                    {% elif "POLICY" in claim.ai_recommendation|upper %}
+                                                        <span class="badge bg-info">Policy Block</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning text-dark">Review</span>
+                                                    {% endif %}
+                                                    <br>
+                                                    <small style="color: #666; margin-top: 3px; display: block;">{{ claim.ai_recommendation|truncatewords:8 }}</small>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">No Recommendation</span>
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <small style="font-weight: 600;">{{ claim.get_display_ai_confidence|floatformat:0 }}%
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'claim_detail' claim.id %}" class="action-btn btn-view" style="padding: 6px 12px; font-size: 11px; white-space: nowrap;">
+                                                <i class="bi bi-eye"></i> Details & Override
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="9" style="text-align: center; padding: 40px; color: #999;">
+                                            <i class="bi bi-check-circle" style="font-size: 40px; margin-bottom: 10px;"></i>
+                                            <p style="margin-top: 10px;">No claims found</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

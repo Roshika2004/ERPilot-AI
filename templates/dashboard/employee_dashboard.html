@@ -1,0 +1,335 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - ERPilot AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+            color: white !important;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+        .container-main {
+            padding: 30px 0;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            text-align: center;
+            border-left: 5px solid #667eea;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        .stat-card.pending {
+            border-left-color: #ffc107;
+        }
+        .stat-card.approved {
+            border-left-color: #28a745;
+        }
+        .stat-card.rejected {
+            border-left-color: #dc3545;
+        }
+        .stat-card.total {
+            border-left-color: #667eea;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .pending { color: #ffc107; }
+        .approved { color: #28a745; }
+        .rejected { color: #dc3545; }
+        .total { color: #667eea; }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-logout:hover {
+            background: #c82333;
+        }
+        .btn-create {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        .welcome-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        .welcome-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .welcome-section p {
+            color: #666;
+            margin: 0;
+        }
+        .claims-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .no-claims {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .btn-view {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        .btn-view:hover {
+            background: #764ba2;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">ERPilot AI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link">
+                            <i class="bi bi-person-circle"></i> {{ user.first_name|default:user.username }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn-logout" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid container-main">
+        <div class="container">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h2>Welcome back, {{ user.first_name|default:user.username }}! </h2>
+                <p>Submit and track your expense claims efficiently.</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Stats Section -->
+            <div class="row g-4 mb-40">
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card pending">
+                        <div class="stat-icon pending">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <div class="stat-label">Pending Claims</div>
+                        <div class="stat-number">{{ pending }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card approved">
+                        <div class="stat-icon approved">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="stat-label">Approved Claims</div>
+                        <div class="stat-number">{{ approved }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card rejected">
+                        <div class="stat-icon rejected">
+                            <i class="bi bi-x-circle"></i>
+                        </div>
+                        <div class="stat-label">Rejected Claims</div>
+                        <div class="stat-number">{{ rejected }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card total">
+                        <div class="stat-icon total">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                        <div class="stat-label">Total Claims</div>
+                        <div class="stat-number">{{ total }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <a href="{% url 'create_claim' %}" class="btn-create">
+                        <i class="bi bi-plus-circle"></i> Submit New Expense Claim
+                    </a>
+                </div>
+            </div>
+
+            <!-- Claims Table -->
+            <div class="claims-table">
+                <h5 style="padding: 20px; margin: 0; background: #f8f9fa; border-bottom: 1px solid #e0e0e0;">
+                    <i class="bi bi-list-check"></i> My Claims
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Amount</th>
+                                <th>Date Submitted</th>
+                                <th>Status</th>
+                                <th>AI Decision</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if my_claims %}
+                                {% for claim in my_claims %}
+                                <tr>
+                                    <td><strong>{{ claim.title|truncatewords:4 }}</strong></td>
+                                    <td><strong>₹{{ claim.amount }}</strong></td>
+                                    <td>{{ claim.created_at|date:"d M Y" }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ claim.status|lower }}">
+                                            <i class="bi bi-{% if claim.status == 'APPROVED' %}check-circle{% elif claim.status == 'REJECTED' %}x-circle{% else %}hourglass-split{% endif %}"></i>
+                                            {{ claim.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small>{{ claim.ai_recommendation|truncatewords:5|default:"Pending analysis" }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'employee_claim_detail' claim.id %}" class="btn-view">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="no-claims">
+                                        <i class="bi bi-inbox" style="font-size: 40px;"></i>
+                                        <p style="margin-top: 10px;">No claims submitted yet. Start by submitting your first expense claim.</p>
+                                        <a href="{% url 'create_claim' %}" class="btn-create" style="margin-top: 10px;">
+                                            <i class="bi bi-plus-circle"></i> Submit Your First Claim
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Employee - ERPilot AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+        }
+        .container-main {
+            padding: 30px 0;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 20px;
+        }
+        .card-header h4 {
+            margin: 0;
+        }
+        .employee-profile {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+        .profile-info h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .profile-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .role-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .detail-row {
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .detail-value {
+            color: #333;
+            font-size: 15px;
+        }
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover {
+            background: #5a6268;
+            text-decoration: none;
+        }
+        .relationship-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #667eea;
+        }
+        .relationship-section h5 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .btn-assign {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-assign:hover {
+            background: #218838;
+        }
+        .btn-unassign {
+            background: #dc3545;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-unassign:hover {
+            background: #c82333;
+        }
+        .assigned-badge {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .not-assigned-badge {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .claims-section {
+            margin-top: 30px;
+        }
+        .claims-header {
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .claim-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .claim-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .claim-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .claim-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            font-size: 13px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-label {
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .info-value {
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #ffc107;
+            color: #333;
+        }
+        .status-approved {
+            background: #28a745;
+            color: white;
+        }
+        .status-rejected {
+            background: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">🚀 ERPilot AI</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid container-main">
+        <div class="container">
+            <a href="{% url 'manager_dashboard' %}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+
+            <!-- Employee Profile Card -->
+            <div class="employee-profile">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h3>{{ employee.get_full_name|default:employee.username }}</h3>
+                        <p>
+                            <strong>Email:</strong> {{ employee.email }}
+                        </p>
+                        <div>
+                            <span class="role-badge">
+                                <i class="bi bi-briefcase"></i> {{ employee_profile.role }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 20px 0;">
+                    <div class="detail-row">
+                        <div class="detail-label">Username:</div>
+                        <div class="detail-value">{{ employee.username }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Email:</div>
+                        <div class="detail-value">{{ employee.email|default:"Not provided" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Date Joined:</div>
+                        <div class="detail-value">{{ employee.date_joined|date:"d M Y" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Role:</div>
+                        <div class="detail-value">{{ employee_profile.role }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Relationship Management Section -->
+            <div class="relationship-section">
+                <h5><i class="bi bi-diagram-3"></i> Manager Assignment</h5>
+                
+                {% if employee_profile.manager == request.user %}
+                    <p style="margin-bottom: 15px; color: #333;">
+                        ✅ This employee is currently assigned to you.
+                    </p>
+                    <div class="assigned-badge">
+                        <i class="bi bi-check-circle"></i> Assigned to {{ request.user.get_full_name|default:request.user.username }}
+                    </div>
+                    <form method="POST" style="margin-top: 20px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="assign_to_manager" value="no">
+                        <button type="submit" class="btn-unassign">
+                            <i class="bi bi-dash-circle"></i> Remove Assignment
+                        </button>
+                    </form>
+                {% else %}
+                    <p style="margin-bottom: 15px; color: #333;">
+                        This employee is not currently assigned to you. Assign them to manage their claims.
+                    </p>
+                    <div class="not-assigned-badge">
+                        <i class="bi bi-exclamation-circle"></i> Not assigned to you
+                    </div>
+                    <form method="POST" style="margin-top: 20px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="assign_to_manager" value="yes">
+                        <button type="submit" class="btn-assign">
+                            <i class="bi bi-plus-circle"></i> Assign to Me
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <!-- Claims Statistics Section -->
+            <div style="margin-top: 30px;">
+                <h5 style="margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #667eea;">
+                    <i class="bi bi-graph-up"></i> Claim Statistics
+                </h5>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-align: center; border-left: 4px solid #667eea;">
+                        <div style="font-size: 24px; font-weight: 700; color: #667eea;">{{ total_claims }}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Total Claims</div>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-align: center; border-left: 4px solid #ffc107;">
+                        <div style="font-size: 24px; font-weight: 700; color: #ffc107;">{{ pending_claims }}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Pending</div>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-align: center; border-left: 4px solid #28a745;">
+                        <div style="font-size: 24px; font-weight: 700; color: #28a745;">{{ approved_claims }}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Approved</div>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-align: center; border-left: 4px solid #dc3545;">
+                        <div style="font-size: 24px; font-weight: 700; color: #dc3545;">{{ rejected_claims }}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Rejected</div>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-align: center; border-left: 4px solid #17a2b8;">
+                        <div style="font-size: 24px; font-weight: 700; color: #17a2b8;">{{ overridden_claims }}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Overridden</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Claims Section -->
+            <div class="claims-section">
+                <div class="claims-header">
+                    <h5 style="margin: 0;">
+                        <i class="bi bi-file-text"></i> All Claims from This Employee
+                    </h5>
+                </div>
+
+                {% if employee_claims %}
+                    {% for claim in employee_claims %}
+                    <div class="claim-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <div class="claim-title">
+                                    {{ claim.title }}
+                                    <span class="status-badge status-{{ claim.status|lower }}">
+                                        {{ claim.status }}
+                                    </span>
+                                    {% if claim.override_status != 'NONE' %}
+                                        <span class="badge bg-info" title="Manager has overridden the AI decision">
+                                            <i class="bi bi-shield-check"></i> Overridden
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="claim-info">
+                                    <div class="info-item">
+                                        <span class="info-label">Amount</span>
+                                        <span class="info-value" style="font-weight: 600; color: #28a745;">₹{{ claim.amount }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Date Submitted</span>
+                                        <span class="info-value">{{ claim.created_at|date:"d M Y" }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Fraud Score</span>
+                                        <span class="info-value">
+                                            {% if claim.fraud_score > 70 %}
+                                                <span style="color: #dc3545; font-weight: 600;">{{ claim.fraud_score }}% (High)</span>
+                                            {% elif claim.fraud_score > 40 %}
+                                                <span style="color: #ffc107; font-weight: 600;">{{ claim.fraud_score }}% (Medium)</span>
+                                            {% else %}
+                                                <span style="color: #28a745; font-weight: 600;">{{ claim.fraud_score }}% (Low)</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">AI Recommendation</span>
+                                        <span class="info-value">{{ claim.ai_recommendation|default:"N/A" }}</span>
+                                    </div>
+                                </div>
+                                {% if claim.override_status != 'NONE' %}
+                                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #666; background: #f0f8ff; padding: 10px; border-radius: 5px;">
+                                    <strong><i class="bi bi-info-circle"></i> Manager Override:</strong> {{ claim.override_status }}<br>
+                                    <strong>Reason:</strong> {{ claim.override_reason }}<br>
+                                    <strong>By:</strong> {{ claim.overridden_by.get_full_name|default:claim.overridden_by.username }}<br>
+                                    <strong>Date:</strong> {{ claim.overridden_at|date:"d M Y, H:i" }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div style="margin-left: 15px;">
+                                <a href="{% url 'claim_detail' claim.id %}" class="btn btn-sm" style="background: #667eea; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; display: block; white-space: nowrap; margin-bottom: 8px;">
+                                    <i class="bi bi-eye"></i> Review & Override
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="background: white; padding: 40px; text-align: center; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);">
+                        <i class="bi bi-inbox" style="font-size: 40px; color: #ccc;"></i>
+                        <p style="margin-top: 15px; color: #999;">No claims from this employee</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+[run]
+omit =
+    ai_agents/views.py
+    ai_agents/tests.py

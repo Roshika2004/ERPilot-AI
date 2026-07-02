@@ -1,0 +1,352 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Details - ERPilot AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+        }
+        .container-main {
+            padding: 30px 0;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 20px;
+        }
+        .card-header h4 {
+            margin: 0;
+        }
+        .detail-row {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .detail-value {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .ai-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .ai-section h5 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .score-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .score-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .score-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .score-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        .override-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+        .override-section h5 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .btn-override {
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+        .btn-approve:hover {
+            background: #218838;
+        }
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-reject:hover {
+            background: #c82333;
+        }
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover {
+            background: #5a6268;
+            text-decoration: none;
+        }
+        .invoice-preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .invoice-preview a {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .invoice-preview a:hover {
+            background: #5568d3;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">ERPilot AI</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid container-main">
+        <div class="container">
+            <a href="{% url 'manager_dashboard' %}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+
+            <!-- Claim Details -->
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="bi bi-file-text"></i> Claim Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="detail-row">
+                        <div>
+                            <div class="detail-label">Claim Title</div>
+                            <div class="detail-value">{{ claim.title }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Employee Name</div>
+                            <div class="detail-value">{{ claim.employee.get_full_name|default:claim.employee.username }}</div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div>
+                            <div class="detail-label">Claim Amount</div>
+                            <div class="detail-value" style="font-size: 20px; color: #28a745;">₹{{ claim.amount }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Date Submitted</div>
+                            <div class="detail-value">{{ claim.created_at|date:"d M Y, H:i" }}</div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div>
+                            <div class="detail-label">Current Status</div>
+                            <div class="detail-value">
+                                {% if claim.override_status == 'APPROVED' %}
+                                    <span class="badge bg-success">Manager Approved</span>
+                                {% elif claim.override_status == 'REJECTED' %}
+                                    <span class="badge bg-danger">Manager Rejected</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">{{ claim.status }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Invoice Document</div>
+                            {% if claim.invoice %}
+                                <div class="invoice-preview">
+                                    <a href="{% url 'download_claim_invoice' claim.id %}" download>
+                                        <i class="bi bi-download"></i> Download Invoice
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="detail-value">No invoice uploaded</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Analysis Section -->
+            <div class="ai-section">
+                <h5><i class="bi bi-robot"></i> AI Analysis & Recommendation</h5>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <strong>Fraud Score:</strong>
+                        <span class="score-badge {% if claim.fraud_score > 70 %}score-high{% elif claim.fraud_score > 40 %}score-medium{% else %}score-low{% endif %}">
+                            {{ claim.fraud_score }}%
+                        </span>
+                    </div>
+                    <!-- <div>
+                        <strong>AI Confidence:</strong>
+                        <span class="score-badge {% if claim.ai_confidence > 70 %}score-high{% elif claim.ai_confidence > 40 %}score-medium{% else %}score-low{% endif %}">
+                        {{ claim.ai_confidence|floatformat:0 }}%
+                        </span>
+                    </div> -->
+                    <div>
+                        <strong>AI Confidence:</strong>
+
+                        <span class="score-badge {% if claim.get_display_ai_confidence > 70 %}score-high{% elif claim.get_display_ai_confidence > 40 %}score-medium{% else %}score-low{% endif %}">
+                        {{ claim.get_display_ai_confidence }}%
+                        </span>
+                    </div>
+
+
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>AI Recommendation:</strong>
+                    <p style="margin-top: 10px; padding: 10px; background: white; border-radius: 5px; border-left: 3px solid #667eea;">
+                        {{ claim.ai_recommendation|default:"No recommendation available" }}
+                    </p>
+                </div>
+
+                <div>
+                    <strong>AI Reasoning:</strong>
+                    <p style="margin-top: 10px; padding: 10px; background: white; border-radius: 5px; border-left: 3px solid #667eea; font-size: 14px; color: #555;">
+                        {{ claim.ai_reasoning|default:"No reasoning provided" }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Manager Override Section -->
+            <div class="override-section">
+                <h5><i class="bi bi-shield-check"></i> Manager Decision Override</h5>
+
+                {% if claim.override_status != 'NONE' %}
+                    <div class="alert alert-info">
+                        <strong>This claim has been overridden!</strong>
+                        <p style="margin-top: 10px; margin-bottom: 0;">
+                            <strong>Override Status:</strong> {{ claim.override_status }}<br>
+                            <strong>Overridden By:</strong> {{ claim.overridden_by.get_full_name|default:claim.overridden_by.username }}<br>
+                            <strong>Override Date:</strong> {{ claim.overridden_at|date:"d M Y, H:i" }}<br>
+                            <strong>Override Reason:</strong> {{ claim.override_reason }}
+                        </p>
+                    </div>
+                {% else %}
+                    <form method="POST" style="margin-top: 20px;">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label class="form-label">Your Decision:</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div style="position: relative;">
+                                    <input type="radio" name="override_status" id="approve" value="APPROVED" required>
+                                    <label for="approve" style="margin-left: 10px; cursor: pointer; font-weight: 600; color: #28a745;">
+                                        <i class="bi bi-check-circle"></i> Approve Claim
+                                    </label>
+                                </div>
+                                <div style="position: relative;">
+                                    <input type="radio" name="override_status" id="reject" value="REJECTED" required>
+                                    <label for="reject" style="margin-left: 10px; cursor: pointer; font-weight: 600; color: #dc3545;">
+                                        <i class="bi bi-x-circle"></i> Reject Claim
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reason" class="form-label">Reason for Override (Optional):</label>
+                            <textarea 
+                                name="override_reason" 
+                                id="reason" 
+                                class="form-control" 
+                                rows="4" 
+                                placeholder="Explain why you are overriding the AI decision..."
+                                style="border-radius: 8px; border: 1px solid #ddd; padding: 12px; font-size: 14px;">
+                            </textarea>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px;">
+                            <button type="submit" name="action" value="approve" class="btn-override btn-approve">
+                                <i class="bi bi-check-circle"></i> Approve Claim
+                            </button>
+                            <button type="submit" name="action" value="reject" class="btn-override btn-reject">
+                                <i class="bi bi-x-circle"></i> Reject Claim
+                            </button>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

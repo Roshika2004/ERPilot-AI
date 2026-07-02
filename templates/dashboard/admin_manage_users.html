@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage All Users - ERPilot AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+        }
+        .container-main {
+            padding: 30px 0;
+        }
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        .page-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            background: #5a6268;
+            text-decoration: none;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 20px;
+        }
+        .card-header h5 {
+            margin: 0;
+        }
+        .user-table {
+            width: 100%;
+        }
+        .user-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding: 15px;
+        }
+        .user-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        .user-table tbody tr:hover {
+            background: #f9f9f9;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .role-admin {
+            background: #667eea;
+            color: white;
+        }
+        .role-manager {
+            background: #17a2b8;
+            color: white;
+        }
+        .role-employee {
+            background: #28a745;
+            color: white;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+        }
+        .empty-state-icon {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        .empty-state-text {
+            color: #999;
+        }
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">ERPilot AI</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid container-main">
+        <div class="container">
+            <a href="{% url 'admin_dashboard' %}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="bi bi-people-fill"></i> Manage All Users</h1>
+                <p>View and manage all users in the system</p>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_users|default:0 }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_admins|default:0 }}</div>
+                    <div class="stat-label">Admins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_managers|default:0 }}</div>
+                    <div class="stat-label">Managers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_employees|default:0 }}</div>
+                    <div class="stat-label">Employees</div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-table"></i> All Users</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if users %}
+                        <div class="table-responsive">
+                            <table class="table table-hover user-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Full Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Joined</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    {% with profile=user.userprofile %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ user.username }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ user.get_full_name|default:"-" }}
+                                        </td>
+                                        <td>
+                                            {{ user.email|default:"-" }}
+                                        </td>
+                                        <td>
+                                            {% if profile %}
+                                                {% if profile.role == 'ADMIN' %}
+                                                    <span class="role-badge role-admin">ADMIN</span>
+                                                {% elif profile.role == 'MANAGER' %}
+                                                    <span class="role-badge role-manager">MANAGER</span>
+                                                {% elif profile.role == 'EMPLOYEE' %}
+                                                    <span class="role-badge role-employee">EMPLOYEE</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">NO PROFILE</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ user.date_joined|date:"d M Y" }}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if profile.manager %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle"></i> Assigned
+                                                    </span>
+                                                {% elif profile.role == 'EMPLOYEE' %}
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="bi bi-exclamation-circle"></i> Unassigned
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-info">
+                                                        <i class="bi bi-info-circle"></i> Active
+                                                    </span>
+                                                {% endif %}
+                                                {% if user != request.user %}
+                                                    <form method="post" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this user?')">
+                                                            <i class="bi bi-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endwith %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+                            <div class="empty-state-text">
+                                <p>No users found in the system.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
