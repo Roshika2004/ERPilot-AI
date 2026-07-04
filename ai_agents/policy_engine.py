@@ -11,11 +11,10 @@ from claims.models import Claim
 
 POLICY_LIMITS = {
     "flight": {"approve": 12000, "review": 20000, "reject": 20000},
-    "hotel": {"approve": 5000, "review": 10000, "reject": 10000},
-    "food": {"approve": 1000, "review": 2000, "reject": 2000},
-    "taxi": {"approve": 1500, "review": 3000, "reject": 3000},
+    "hotel": {"approve": 6000, "review": 12000, "reject": 15000},
+    "food": {"approve": 2000, "review": 3000, "reject": 4000},
+    "taxi": {"approve": 1000, "review": 1500, "reject": 2000},
 }
-
 
 def _normalize_text(value: str) -> str:
     return (value or "").lower().strip()
