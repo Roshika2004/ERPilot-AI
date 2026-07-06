@@ -16,6 +16,7 @@ POLICY_LIMITS = {
     "taxi": {"approve": 1000, "review": 1500, "reject": 2000},
 }
 
+
 def _normalize_text(value: str) -> str:
     return (value or "").lower().strip()
 
@@ -123,12 +124,12 @@ def _extract_receipt_amount(value: Any) -> Optional[Decimal]:
         if not cleaned.isdigit() and not (cleaned.replace(".", "", 1).isdigit()):
             continue
         try:
-            value = Decimal(cleaned)
+            val = Decimal(cleaned)
         except InvalidOperation:
             continue
-        if value <= 0:
+        if val <= 0:
             continue
-        return value
+        return val
 
     return None
 
@@ -320,15 +321,22 @@ def policy_engine(claim, employee_history=None):
 
     expense_type = _expense_type_from_title(title)
 
-    # Any amount over the approve limit → REJECT immediately
+    # THREE-TIER amount check:
+    # > reject limit  → REJECT
+    # > approve limit → MANUAL_REVIEW
+    # <= approve      → APPROVE (no flag)
     if expense_type in POLICY_LIMITS:
         limits = POLICY_LIMITS[expense_type]
-        if amount > limits["approve"]:
-            flags.append(f"{expense_type.title()} claim exceeds policy limit of ₹{limits['approve']}")
+        if amount > limits["reject"]:
+            flags.append(f"{expense_type.title()} claim exceeds hard limit of ₹{limits['reject']}")
             decision = "REJECT"
             violation = True
+        elif amount > limits["approve"]:
+            flags.append(f"{expense_type.title()} claim exceeds normal limit of ₹{limits['approve']}")
+            decision = "MANUAL_REVIEW"
+            violation = True
 
-    # Amount mismatch is no longer treated as a blocking policy violation.
+    # Duplicate receipt → MANUAL_REVIEW (unless already REJECT)
     duplicate_check = _duplicate_receipt_status(claim)
     if duplicate_check["duplicate"]:
         flags.append(duplicate_check["flag"])
@@ -348,7 +356,7 @@ def policy_engine(claim, employee_history=None):
     if mem["flags"]:
         flags.extend(mem["flags"])
 
-    # HIGH memory risk → REJECT
+    # HIGH memory risk escalates APPROVE → REJECT
     if mem["risk_level"] == "HIGH":
         if decision == "APPROVE":
             decision = "REJECT"
@@ -379,13 +387,20 @@ def check_policy(employee_id, title, amount, invoice_amount=None, claim_date=Non
 
     expense_type = _expense_type_from_title(title)
 
-    # Any amount over approve limit → HIGH risk (triggers REJECT in claim_analyzer)
+    # THREE-TIER amount check:
+    # > reject limit  → HIGH risk  (triggers REJECT in claim_analyzer)
+    # > approve limit → MEDIUM risk (triggers MANUAL_REVIEW in claim_analyzer)
+    # <= approve      → no flag
     if expense_type in POLICY_LIMITS:
         limits = POLICY_LIMITS[expense_type]
-        if amount > limits["approve"]:
-            flags.append(f"{expense_type.title()} claim exceeds policy limit of ₹{limits['approve']}")
+        if amount > limits["reject"]:
+            flags.append(f"{expense_type.title()} claim exceeds hard limit of ₹{limits['reject']}")
             violation = True
             risk_level = "HIGH"
+        elif amount > limits["approve"]:
+            flags.append(f"{expense_type.title()} claim exceeds normal limit of ₹{limits['approve']}")
+            violation = True
+            risk_level = "MEDIUM"
 
     # Invoice mismatch → MEDIUM risk (triggers MANUAL_REVIEW in claim_analyzer)
     if invoice_amount is not None:
