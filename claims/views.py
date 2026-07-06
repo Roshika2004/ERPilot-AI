@@ -31,26 +31,27 @@ def create_claim(request):
 
             if policy_result["violation"]:
 
-                manual_review_only = any(
-                    flag in policy_result["flags"]
-                    for flag in [
-                        "Invoice total mismatch: entered",
-                        "Duplicate receipt detected for this employee; manual review required",
-                    ]
-                )
+                # Use policy_engine's actual decision — it already knows
+                # APPROVE / MANUAL_REVIEW / REJECT based on the three-tier limits
+                policy_decision = policy_result["decision"]
 
-                if manual_review_only:
-                    claim.ai_recommendation = "MANUAL_REVIEW"
+                claim.ai_recommendation = policy_decision
+                claim.ai_reasoning = policy_result["reason"]
+
+                if policy_decision == "REJECT":
+                    claim.fraud_score = 100
+                    claim.ai_confidence = 40
+                    claim.status = "REJECTED"
+                elif policy_decision == "MANUAL_REVIEW":
                     claim.fraud_score = 50
                     claim.ai_confidence = 60
                     claim.status = "PENDING"
                 else:
-                    claim.ai_recommendation = "REJECT"
-                    claim.fraud_score = 100
-                    claim.ai_confidence = 40
-                    claim.status = "REJECTED"
+                    # APPROVE — violation flagged but decision is still approve
+                    claim.fraud_score = 10
+                    claim.ai_confidence = 90
+                    claim.status = "APPROVED"
 
-                claim.ai_reasoning = policy_result["reason"]
                 claim.save()
 
                 messages.warning(
@@ -80,7 +81,6 @@ def create_claim(request):
                 }
 
             # SAVE AI RESULTS
-            # FIX: store final_decision (APPROVE/REJECT/MANUAL_REVIEW), not raw ai_response
             claim.ai_recommendation = ai_result.get("final_decision", "MANUAL_REVIEW")
             claim.ai_confidence = ai_result.get("confidence", 0)
             claim.fraud_score = ai_result.get("fraud_score", 0)
